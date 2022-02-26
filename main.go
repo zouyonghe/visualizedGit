@@ -20,4 +20,5 @@ import "visualizedGit/cmd"
 
 func main() {
 	cmd.Execute()
+	//cmd.PrintUsage()
 }

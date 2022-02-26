@@ -6,7 +6,6 @@ package cmd
 
 import (
 	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -20,8 +19,7 @@ var versionCmd = &cobra.Command{
 	Short: "Show the version information",
 	Long:  `Show the version information of visualizedGit tool`,
 	Run: func(cmd *cobra.Command, args []string) {
-		version = "0.0.1"
-		fmt.Println("VisualizedGit ", version)
+		PrintVersion()
 	},
 }
 
@@ -37,4 +35,9 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// versionCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func PrintVersion() {
+	version = "0.0.2"
+	fmt.Println("VisualizedGit version ", version)
 }

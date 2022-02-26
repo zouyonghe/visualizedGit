@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/user"
 	"strings"
@@ -90,7 +91,8 @@ func ParseFileLinesToSlice(filePath string) []string {
 	scanner := bufio.NewScanner(f)
 	if err := scanner.Err(); err != nil {
 		if err != io.EOF {
-			panic(err)
+			//panic(err)
+			log.Fatal(err)
 		}
 	}
 	for scanner.Scan() {
@@ -98,7 +100,8 @@ func ParseFileLinesToSlice(filePath string) []string {
 	}
 	if err := scanner.Err(); err != nil {
 		if err != io.EOF {
-			panic(err)
+			//panic(err)
+			log.Fatal(err)
 		}
 	}
 	return lines
@@ -113,12 +116,13 @@ func openFile(filePath string) *os.File {
 			// file does not exist
 			f, err = os.Create(filePath)
 			if err != nil {
-				panic(err)
+				//panic(err)
+				log.Fatal(err)
 			}
 		} else {
 			// other error
-			//log.Fatal(err)
-			panic(err)
+			log.Fatal(err)
+			//panic(err)
 		}
 	}
 

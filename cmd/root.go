@@ -17,8 +17,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package cmd
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
 	"os"
+	"visualizedGit/removeConfig"
 	"visualizedGit/scan"
 	"visualizedGit/stats"
 )
@@ -26,17 +28,27 @@ import (
 var (
 	folder string
 	email  string
+	rmcfg  bool
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "visualizedGit [--add <PATH>] [--email <email address>]",
+	Use:   "visualizedGit",
 	Short: "Visualize local git contributions.",
 	Long: `VisualizedGit is a CLI tool for developers to visualize their git contributions.
 Developers can specify the git repository and view the visualized local git contributions.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) == 0 {
+			PrintVersion()
+			fmt.Printf("Using \"visualizedGit help\" for help information\n")
+			return
+		}
+		if rmcfg == true {
+			removeConfig.Rmcfg()
+			return
+		}
 		if folder != "" {
 			scan.Scan(folder)
 			return
@@ -63,6 +75,7 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().StringVar(&folder, "add", "", "Add a new folder to scan for Git repositories")
-	rootCmd.Flags().StringVar(&email, "email", "", "Your email address to scan")
+	rootCmd.Flags().BoolVar(&rmcfg, "rmcfg", false, "Remove the existing configuration file")
+	rootCmd.Flags().StringVarP(&folder, "add", "a", "", "Add a new folder to scan for Git repositories")
+	rootCmd.Flags().StringVarP(&email, "email", "e", "", "Your email address to scan")
 }
