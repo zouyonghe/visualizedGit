@@ -22,5 +22,4 @@ import (
 
 func main() {
 	cmd.Execute()
-	//fmt.Println(cmd.IsArgsExist())
 }

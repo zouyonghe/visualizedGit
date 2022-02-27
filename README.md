@@ -13,8 +13,10 @@ go install
 ## Usage
 
 ```shell
-visualizedGit --add /path/to/repo          # Add you Git repository to monitor
-visualizedGit --email email@address.com    # The email address reference to your commits
+visualizedGit add /path/to/repo(dir)          # Add you Git repository to track
+visualizedGit show --email email@address.com  # show visualized local git contribution
+visualizedGit chkcfg                          # Show tracking git repositories
+visualizedGit rmcfg                           # Remove tracking git repositories
 ```
 
 ## License

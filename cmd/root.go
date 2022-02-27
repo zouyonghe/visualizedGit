@@ -30,27 +30,13 @@ var visualizedGitVersion = "0.0.2"
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "visualizedGit",
-	Short: "Visualize local git contributions.",
-	Long: `VisualizedGit is a CLI tool for developers to visualize their git contributions.
-Developers can specify the git repository and view the visualized local git contributions.`,
+	Short: "Visualize local git contribution.",
+	Long: `VisualizedGit is a CLI tool for developers to visualize their git contribution.
+Developers can specify the git repository and view the visualized local git contribution.`,
 	Version: visualizedGitVersion,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	/*	Run: func(cmd *cobra.Command, args []string) {
-		if folder == "" && email == "" {
-			//PrintVersion()
-			color.Green("visualizedGit version %s", visualizedGitVersion)
-			fmt.Println("Visualize local git contributions.")
-			fmt.Printf("Using \"visualizedGit --help\" or \"visualizedGit -h\" for more information.\n")
-			return
-		}
-
-		if folder != "" {
-			scan.Scan(folder)
-			return
-		}
-		stats.Stats(email)
-	},*/
+	//	Run: func(cmd *cobra.Command, args []string) {},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

@@ -176,7 +176,6 @@ func calcOffset() int {
 	case time.Saturday:
 		offset = 6
 	}
-
 	return offset
 }
 
@@ -188,7 +187,7 @@ func printCell(val int, today bool) {
 	case val > 0 && val < 5:
 		escape = "\033[1;30;47m"
 	case val >= 5 && val < 10:
-		escape = "\033[1;30;43m"
+		escape = "\033[1;30;46m"
 	case val >= 10:
 		escape = "\033[1;30;42m"
 	}
@@ -237,18 +236,28 @@ func buildCols(keys []int, commits map[int]int) map[int]column {
 	cols := make(map[int]column)
 	col := column{}
 
+	//start := int(time.Now().Weekday())
 	for _, k := range keys {
-		week := k / 7      //26,25...1
+		week := k / 7 //26,25...1
+
 		dayInWeek := k % 7 // 0,1,2,3,4,5,6
 
-		if dayInWeek == 0 { //reset
-			col = column{}
-		}
+		/*	if dayInWeek == 0 { //reset
+			if week == 0 {
+				col = make(column, start)
+			} else {
+				col = column{}
+			}
+		}*/
 
-		col = append(col, commits[k])
-
-		if dayInWeek == 6 {
+		col = append(col, commits[daysInLastSixMonths-k+1])
+		/*if week == 0 && dayInWeek == start {
 			cols[week] = col
+			continue
+		}*/
+		if dayInWeek == 6 || k == len(keys) {
+			cols[week] = col
+			col = column{}
 		}
 	}
 	return cols
@@ -259,13 +268,14 @@ func printCells(cols map[int]column) {
 	//fmt.Println(cols)
 	printMonths()
 	for j := 6; j >= 0; j-- {
-		for i := weeksInLastSixMonths - 1; i >= 0; i-- {
-			if i == weeksInLastSixMonths-1 {
+		/*for i := weeksInLastSixMonths + 1; i >= 0; i-- {*/
+		for i := 0; i < weeksInLastSixMonths; i++ {
+			if i == 0 /*weeksInLastSixMonths*/ {
 				printDayCol(j)
 			}
-			if col, ok := cols[i]; ok {
+			if col, ok := cols[i+1]; ok {
 				//special case today
-				if i == 0 && j == calcOffset() {
+				if i == weeksInLastSixMonths-1 && j == calcOffset() {
 
 					printCell(col[j], true)
 					continue
