@@ -179,7 +179,6 @@ func sortMapIntoSlice(m map[int]int) []int {
 		keys = append(keys, k)
 	}
 	sort.Ints(keys)
-
 	return keys
 }
 
@@ -202,14 +201,14 @@ func buildCols(keys []int, commits map[int]int) map[int]column {
 			cols[week] = col
 		}
 	}
-	//fmt.Println(cols)
+	fmt.Println(cols)
 	return cols
 }
 
 // printCells prints the cells of the graph
 func printCells(cols map[int]column) {
 	printMonths()
-	for j := 0; j < 7; j++ {
+	for j := 6; j >= 0; j-- {
 		for i := weeksInLastSixMonths + 1; i >= 0; i-- {
 			if i == weeksInLastSixMonths+1 {
 				printDayCol(j)
@@ -259,12 +258,20 @@ func printMonths() {
 func printDayCol(day int) {
 	out := "     "
 	switch day {
+	case 0:
+		out = " Sun "
 	case 1:
-		out = " Mon "
+		out = " Sat "
+	case 2:
+		out = " Fri "
 	case 3:
+		out = " Tur "
+	case 4:
 		out = " Wed "
 	case 5:
-		out = " Fri "
+		out = " Tue "
+	case 6:
+		out = " Mon "
 	}
 
 	fmt.Printf(out)
