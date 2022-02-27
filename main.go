@@ -16,9 +16,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 package main
 
-import "visualizedGit/cmd"
+import (
+	"visualizedGit/cmd"
+)
 
 func main() {
 	cmd.Execute()
-	//cmd.PrintUsage()
+	//fmt.Println(cmd.IsArgsExist())
 }

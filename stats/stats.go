@@ -112,19 +112,19 @@ func calcOffset() int {
 
 	switch weekday {
 	case time.Sunday:
-		offset = 7
+		offset = 0
 	case time.Monday:
-		offset = 6
-	case time.Tuesday:
-		offset = 5
-	case time.Wednesday:
-		offset = 4
-	case time.Thursday:
-		offset = 3
-	case time.Friday:
-		offset = 2
-	case time.Saturday:
 		offset = 1
+	case time.Tuesday:
+		offset = 2
+	case time.Wednesday:
+		offset = 3
+	case time.Thursday:
+		offset = 4
+	case time.Friday:
+		offset = 5
+	case time.Saturday:
+		offset = 6
 	}
 
 	return offset
@@ -202,21 +202,21 @@ func buildCols(keys []int, commits map[int]int) map[int]column {
 			cols[week] = col
 		}
 	}
-
+	//fmt.Println(cols)
 	return cols
 }
 
 // printCells prints the cells of the graph
 func printCells(cols map[int]column) {
 	printMonths()
-	for j := 6; j >= 0; j-- {
+	for j := 0; j < 7; j++ {
 		for i := weeksInLastSixMonths + 1; i >= 0; i-- {
 			if i == weeksInLastSixMonths+1 {
 				printDayCol(j)
 			}
 			if col, ok := cols[i]; ok {
 				//special case today
-				if i == 0 && j == calcOffset()-1 {
+				if i == 0 && j == calcOffset() {
 					printCell(col[j], true)
 					continue
 				} else {

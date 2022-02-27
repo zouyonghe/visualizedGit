@@ -18,6 +18,9 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/fatih/color"
+
+	//"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"os"
 	"visualizedGit/removeConfig"
@@ -31,18 +34,26 @@ var (
 	rmcfg  bool
 )
 
+var visualizedGitVersion = "0.0.2"
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "visualizedGit",
 	Short: "Visualize local git contributions.",
 	Long: `VisualizedGit is a CLI tool for developers to visualize their git contributions.
 Developers can specify the git repository and view the visualized local git contributions.`,
+	Version: visualizedGitVersion,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			PrintVersion()
-			fmt.Printf("Using \"visualizedGit help\" for help information\n")
+		/*		for _, v := range args {
+				fmt.Println(v)
+			}*/
+		if rmcfg == false && folder == "" && email == "" {
+			//PrintVersion()
+			color.Green("visualizedGit version %s", visualizedGitVersion)
+			fmt.Println("Visualize local git contributions.")
+			fmt.Printf("Using \"visualizedGit --help\" or \"visualizedGit -h\" for more information.\n")
 			return
 		}
 		if rmcfg == true {
@@ -77,5 +88,15 @@ func init() {
 	// when this action is called directly.
 	rootCmd.Flags().BoolVar(&rmcfg, "rmcfg", false, "Remove the existing configuration file")
 	rootCmd.Flags().StringVarP(&folder, "add", "a", "", "Add a new folder to scan for Git repositories")
-	rootCmd.Flags().StringVarP(&email, "email", "e", "", "Your email address to scan")
+	rootCmd.Flags().StringVarP(&email, "email", "e", "", "The email address reference to commits")
 }
+
+/*func IsArgsExist(args ...string) bool {
+	for _, arg := range args {
+		if arg == arg.Default {
+			return false
+		}
+	}
+	return true
+}
+*/
