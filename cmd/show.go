@@ -38,7 +38,7 @@ var showCmd = &cobra.Command{
 		if email == "" {
 			color.Red("No email address specified error!")
 			fmt.Println()
-			fmt.Println("Using \"/visualizedGit add --help\" for more information")
+			fmt.Println("Using \"visualizedGit add --help\" for more information")
 			return
 		}
 		stats(email)

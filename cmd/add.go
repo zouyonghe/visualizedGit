@@ -34,7 +34,7 @@ var addCmd = &cobra.Command{
 		if path == "" {
 			color.Red("No path specified error!")
 			fmt.Println()
-			fmt.Println("Using \"/visualizedGit add --help\" for more information")
+			fmt.Println("Using \"visualizedGit add --help\" for more information")
 			return
 		}
 		scan(path)

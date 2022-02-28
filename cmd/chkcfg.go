@@ -59,5 +59,6 @@ func chkcfg() {
 			fmt.Println(val)
 		}
 	}
+	fmt.Println()
 	fmt.Println("Finished checking configuration.")
 }
