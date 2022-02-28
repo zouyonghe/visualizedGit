@@ -32,7 +32,7 @@ import (
 // showCmd represents the show command
 var showCmd = &cobra.Command{
 	Use:   "show [-e email|--email email]",
-	Short: "Show visualized local git contributions.",
+	Short: "Show visualized local git contributions",
 	Long:  `Show visualized local git contributions.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if email == "" {

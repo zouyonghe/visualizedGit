@@ -26,7 +26,7 @@ import (
 // chkcfgCmd represents the chkcfg command
 var chkcfgCmd = &cobra.Command{
 	Use:   "chkcfg",
-	Short: "Check the tracking repositories in configuration file.",
+	Short: "Check the tracking repositories in configuration file",
 	Long:  `Check the tracking repositories in configuration file.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		chkcfg()

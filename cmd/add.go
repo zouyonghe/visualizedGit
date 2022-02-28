@@ -28,7 +28,7 @@ var path string
 // addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:   "add [-p path|--path path]",
-	Short: "Add a new folder to scan for Git repositories.",
+	Short: "Add a new folder to scan for Git repositories",
 	Long:  `Add a new folder to scan for Git repositories.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if path == "" {
