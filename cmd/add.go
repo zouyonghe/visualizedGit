@@ -53,7 +53,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	addCmd.Flags().StringVarP(&path, "path", "p", "", "The path to scan.")
+	addCmd.Flags().StringVarP(&path, "path", "p", "", "The path of repositories to be tracked")
 }
 
 func scan(folder string) {
