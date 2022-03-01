@@ -61,13 +61,12 @@ func init() {
 }
 
 const outOfRange = 99999
-const daysInLastSixMonths = 183
-const weeksInLastSixMonths = 26
 
 type column []int
 
 // Stats calculates and prints the stats.
 func stats(email string) {
+
 	commits := processRepositories(email)
 	printCommitsStats(commits)
 }
@@ -86,7 +85,7 @@ func countDaysSinceDate(date time.Time) int {
 	for date.Before(now) {
 		date = date.Add(time.Hour * 24)
 		days++
-		if days > daysInLastSixMonths {
+		if days > lib.GetDaysInLastSixMonths() {
 			return outOfRange
 		}
 	}
@@ -114,10 +113,10 @@ func fillCommits(email string, path string, commits map[int]int) map[int]int {
 		return commits
 	}
 	// iterate the commits
-	offset := calcOffset()
+	//offset := calcOffset()
 	err = iterator.ForEach(func(c *object.Commit) error {
-		daysAgo := countDaysSinceDate(c.Author.When) + offset
-
+		daysAgo := countDaysSinceDate(c.Author.When) //+ offset
+		fmt.Println("daysAgo:", daysAgo)
 		if c.Author.Email != email {
 			return nil
 		}
@@ -140,7 +139,7 @@ func fillCommits(email string, path string, commits map[int]int) map[int]int {
 func processRepositories(email string) map[int]int {
 	filePath := lib.GetDotFilePath()
 	repos := lib.ParseFileLinesToSlice(filePath)
-	daysInMap := daysInLastSixMonths
+	daysInMap := lib.GetDaysInLastSixMonths()
 
 	commits := make(map[int]int, daysInMap)
 	for i := daysInMap; i > 0; i-- {
@@ -150,7 +149,7 @@ func processRepositories(email string) map[int]int {
 	for _, path := range repos {
 		commits = fillCommits(email, path, commits)
 	}
-
+	fmt.Println("commits: ", commits)
 	return commits
 }
 
@@ -233,6 +232,7 @@ func sortMapIntoSlice(m map[int]int) []int {
 
 // buildCols generates a map with rows and columns ready to be printed to screen
 func buildCols(keys []int, commits map[int]int) map[int]column {
+	fmt.Println(commits)
 	cols := make(map[int]column)
 	col := column{}
 
@@ -250,7 +250,7 @@ func buildCols(keys []int, commits map[int]int) map[int]column {
 			}
 		}*/
 
-		col = append(col, commits[daysInLastSixMonths-k+1])
+		col = append(col, commits[lib.GetDaysInLastSixMonths()-k+1])
 		/*if week == 0 && dayInWeek == start {
 			cols[week] = col
 			continue
@@ -260,6 +260,10 @@ func buildCols(keys []int, commits map[int]int) map[int]column {
 			col = column{}
 		}
 	}
+
+	fmt.Println()
+	fmt.Println(cols)
+	fmt.Println()
 	return cols
 }
 
@@ -267,16 +271,16 @@ func buildCols(keys []int, commits map[int]int) map[int]column {
 func printCells(cols map[int]column) {
 	//fmt.Println(cols)
 	printMonths()
-	for j := 6; j >= 0; j-- {
+	for j := 0; j < 7; j++ {
 		/*for i := weeksInLastSixMonths + 1; i >= 0; i-- {*/
-		for i := 0; i < weeksInLastSixMonths; i++ {
+		for i := 0; i < lib.GetWeeksInLastSixMon(lib.GetDaysInLastSixMonths()); i++ {
 			if i == 0 /*weeksInLastSixMonths*/ {
 				printDayCol(j)
 			}
 			if col, ok := cols[i+1]; ok {
 				//special case today
-				if i == weeksInLastSixMonths-1 && j == calcOffset() {
-
+				if i == lib.GetWeeksInLastSixMon(lib.GetDaysInLastSixMonths())-1 && j == calcOffset() {
+					fmt.Println("j: ", j)
 					printCell(col[j], true)
 					continue
 				} else {
@@ -295,7 +299,7 @@ func printCells(cols map[int]column) {
 // printMonths prints the month names in the first line, determining when the month
 // changed between switching weeks
 func printMonths() {
-	week := getBeginningOfDay(time.Now()).Add(-(daysInLastSixMonths * time.Hour * 24))
+	week := getBeginningOfDay(time.Now()).Add(-(time.Duration(lib.GetDaysInLastSixMonths()) * time.Hour * 24))
 	month := week.Month()
 	fmt.Printf("         ")
 	for {

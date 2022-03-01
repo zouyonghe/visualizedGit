@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/user"
 	"strings"
+	"time"
 )
 
 // scanGitFolders returns a list of subfolders of `folder` ending with `.git`.
@@ -157,4 +158,43 @@ func dumpStringsSliceToFile(repos []string, filePath string) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func GetDaysInLastSixMonths() int {
+	y, month, day := time.Now().Date()
+	sumDays := day
+	m := int(month) - 1
+	for i := 0; i < 5; i++ {
+		if m > 0 {
+			sumDays += daysOfMonth(y, m)
+		} else {
+			sumDays += daysOfMonth(y-1, 12-m)
+		}
+		m--
+	}
+	return sumDays
+}
+
+func daysOfMonth(year int, month int) int {
+	var days int
+	if month != 2 {
+		if month == 4 || month == 6 || month == 9 || month == 11 {
+			days = 30
+
+		} else {
+			days = 31
+
+		}
+	} else {
+		if ((year%4) == 0 && (year%100) != 0) || (year%400) == 0 {
+			days = 29
+		} else {
+			days = 28
+		}
+	}
+	return days
+}
+
+func GetWeeksInLastSixMon(days int) int {
+	return days/7 + 1
 }
