@@ -29,6 +29,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	web bool
+)
+
 // showCmd represents the show command
 var showCmd = &cobra.Command{
 	Use:   "show [-e email|--email email]",
@@ -40,6 +44,9 @@ var showCmd = &cobra.Command{
 			fmt.Println()
 			fmt.Println("Using \"visualizedGit add --help\" for more information")
 			return
+		}
+		if web == true {
+			fmt.Println("web page called")
 		}
 		stats(email)
 	},
@@ -58,6 +65,7 @@ func init() {
 	// is called directly, e.g.:
 	// showCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	showCmd.Flags().StringVarP(&email, "email", "e", "", "The email address reference to commits")
+	showCmd.Flags().BoolVar(&web, "web", false, "Whether show web page")
 }
 
 const outOfRange = 99999
@@ -276,8 +284,7 @@ func printCells(cols map[int]column) {
 			if col, ok := cols[i+1]; ok {
 				//special case today
 				if i == weeksInLastSixMonths-1 && j == calcOffset() {
-
-					printCell(col[j], true)
+					printCell(col[j-1], true)
 					continue
 				} else {
 					if len(col) > j {
