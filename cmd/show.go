@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/fatih/color"
-	"sort"
+	//"sort"
 	"time"
 	"visualizedGit/lib"
 
@@ -112,11 +112,8 @@ func fillCommits(email string, path string, commits map[int]int) map[int]int {
 		//panic(err)
 		return commits
 	}
-	// iterate the commits
-	//offset := calcOffset()
 	err = iterator.ForEach(func(c *object.Commit) error {
-		daysAgo := countDaysSinceDate(c.Author.When) //+ offset
-		fmt.Println("daysAgo:", daysAgo)
+		daysAgo := countDaysSinceDate(c.Author.When)
 		if c.Author.Email != email {
 			return nil
 		}
@@ -149,7 +146,6 @@ func processRepositories(email string) map[int]int {
 	for _, path := range repos {
 		commits = fillCommits(email, path, commits)
 	}
-	fmt.Println("commits: ", commits)
 	return commits
 }
 
@@ -213,81 +209,50 @@ func printCell(val int, today bool) {
 
 // printCommitsStats prints the commits stats
 func printCommitsStats(commits map[int]int) {
-	keys := sortMapIntoSlice(commits)
-	cols := buildCols(keys, commits)
+	cols := buildCols(commits)
 	printCells(cols)
 }
 
-// sortMapIntoSlice returns a slice of indexes of a map, ordered
-func sortMapIntoSlice(m map[int]int) []int {
-	// order map
-	// To store the keys in slice in sorted order
-	var keys []int
-	for k := range m {
-		keys = append(keys, k)
-	}
-	sort.Ints(keys)
-	return keys
-}
-
 // buildCols generates a map with rows and columns ready to be printed to screen
-func buildCols(keys []int, commits map[int]int) map[int]column {
-	fmt.Println(commits)
+func buildCols(commits map[int]int) map[int]column {
 	cols := make(map[int]column)
 	col := column{}
-
-	//start := int(time.Now().Weekday())
-	for _, k := range keys {
-		week := k / 7 //26,25...1
-
-		dayInWeek := k % 7 // 0,1,2,3,4,5,6
-
-		/*	if dayInWeek == 0 { //reset
-			if week == 0 {
-				col = make(column, start)
-			} else {
-				col = column{}
-			}
-		}*/
-
-		col = append(col, commits[lib.GetDaysInLastSixMonths()-k+1])
-		/*if week == 0 && dayInWeek == start {
+	for i := 0; i < 7-calcOffset()-1; i++ {
+		col = append(col, 0)
+	}
+	for i := 0; i < calcOffset()+1; i++ {
+		col = append(col, commits[i])
+	}
+	cols[0] = col
+	col = column{}
+	week := 1
+	for i := 0; i < len(commits)-calcOffset(); i++ {
+		col = append(col, commits[i+calcOffset()+1])
+		if len(col) == 7 {
 			cols[week] = col
-			continue
-		}*/
-		if dayInWeek == 6 || k == len(keys) {
-			cols[week] = col
+			week++
 			col = column{}
 		}
 	}
-
-	fmt.Println()
-	fmt.Println(cols)
-	fmt.Println()
 	return cols
 }
 
 // printCells prints the cells of the graph
 func printCells(cols map[int]column) {
-	//fmt.Println(cols)
 	printMonths()
 	for j := 0; j < 7; j++ {
-		/*for i := weeksInLastSixMonths + 1; i >= 0; i-- {*/
-		for i := 0; i < lib.GetWeeksInLastSixMon(lib.GetDaysInLastSixMonths()); i++ {
-			if i == 0 /*weeksInLastSixMonths*/ {
+		for i := lib.GetWeeksInLastSixMon(lib.GetDaysInLastSixMonths()); i >= 0; i-- {
+			if i == lib.GetWeeksInLastSixMon(lib.GetDaysInLastSixMonths()) /*weeksInLastSixMonths*/ {
 				printDayCol(j)
 			}
-			if col, ok := cols[i+1]; ok {
+			if col, ok := cols[i]; ok {
 				//special case today
-				if i == lib.GetWeeksInLastSixMon(lib.GetDaysInLastSixMonths())-1 && j == calcOffset() {
-					fmt.Println("j: ", j)
-					printCell(col[j], true)
+				if i == 0 && j == calcOffset() {
+					printCell(col[7-j-1], true)
 					continue
 				} else {
-					if len(col) > j {
-						printCell(col[j], false)
-						continue
-					}
+					printCell(col[7-j-1], false)
+					continue
 				}
 			}
 			printCell(0, false)
@@ -299,9 +264,10 @@ func printCells(cols map[int]column) {
 // printMonths prints the month names in the first line, determining when the month
 // changed between switching weeks
 func printMonths() {
+	//year, month, day := time.Now().Date()
 	week := getBeginningOfDay(time.Now()).Add(-(time.Duration(lib.GetDaysInLastSixMonths()) * time.Hour * 24))
 	month := week.Month()
-	fmt.Printf("         ")
+	fmt.Printf("       ")
 	for {
 		if week.Month() != month {
 			fmt.Printf("%s ", week.Month().String()[:3])
