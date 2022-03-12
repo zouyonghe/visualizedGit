@@ -19,7 +19,6 @@ package cmd
 import (
 	"fmt"
 	"github.com/fatih/color"
-	//"sort"
 	"time"
 	"visualizedGit/lib"
 
