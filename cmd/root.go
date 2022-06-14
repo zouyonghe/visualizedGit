@@ -25,7 +25,7 @@ var (
 	email string
 )
 
-var visualizedGitVersion = "0.0.2"
+var visualizedGitVersion = "1.0.0"
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
