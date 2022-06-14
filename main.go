@@ -17,9 +17,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package main
 
 import (
+	"go.uber.org/zap"
 	"visualizedGit/cmd"
+	"visualizedGit/log"
 )
 
 func main() {
+	logger := log.InitLogger()
+	defer zap.ReplaceGlobals(logger)
+
 	cmd.Execute()
 }

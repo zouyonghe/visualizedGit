@@ -61,5 +61,5 @@ func scan(folder string) {
 	repositories := lib.RecursiveScanFolder(folder)
 	filePath := lib.GetDotFilePath()
 	lib.AddNewSliceElementsToFile(filePath, repositories)
-	fmt.Printf("\nSuccessfully added repositories\n\n")
+	color.Green("\nSuccessfully added repositories\n\n")
 }

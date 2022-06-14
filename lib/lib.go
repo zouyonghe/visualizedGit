@@ -3,6 +3,7 @@ package lib
 import (
 	"bufio"
 	"fmt"
+	"go.uber.org/zap"
 	"io"
 	"io/ioutil"
 	"log"
@@ -21,12 +22,15 @@ func scanGitFolders(folders []string, folder string) []string {
 	//fmt.Println(folders)
 	f, err := os.Open(folder)
 	if err != nil {
-		panic(err)
+		zap.L().Error("Error opening folder", zap.Error(err))
+		os.Exit(-1)
 	}
+	defer func(f *os.File) {
+		_ = f.Close()
+	}(f)
 	files, err := f.Readdir(-1)
-	_ = f.Close()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	var path string
@@ -56,16 +60,16 @@ func RecursiveScanFolder(folder string) []string {
 	return scanGitFolders(make([]string, 0), folder)
 }
 
-// GetDotFilePath returns the dot file for the repos list.
+// GetDotFilePath returns the dot file of the repos list.
 // Creates it and the enclosing folder if it does not exist.
 func GetDotFilePath() string {
 	usr, err := user.Current()
 	if err != nil {
-		panic(err)
+		zap.L().Error("Error fetching current User", zap.Error(err))
+		os.Exit(-1)
 	}
 
 	dotFile := usr.HomeDir + "/.gogitlocalstats"
-
 	return dotFile
 }
 
@@ -82,18 +86,15 @@ func AddNewSliceElementsToFile(filePath string, newRepos []string) {
 func ParseFileLinesToSlice(filePath string) []string {
 	f := openFile(filePath)
 	defer func(f *os.File) {
-		err := f.Close()
-		if err != nil {
-			panic(err)
-		}
+		_ = f.Close()
 	}(f)
 
 	var lines []string
 	scanner := bufio.NewScanner(f)
 	if err := scanner.Err(); err != nil {
 		if err != io.EOF {
-			//panic(err)
-			log.Fatal(err)
+			zap.L().Error("Error creating scanner", zap.Error(err))
+			os.Exit(-1)
 		}
 	}
 	for scanner.Scan() {
@@ -101,8 +102,8 @@ func ParseFileLinesToSlice(filePath string) []string {
 	}
 	if err := scanner.Err(); err != nil {
 		if err != io.EOF {
-			//panic(err)
-			log.Fatal(err)
+			zap.L().Error("Error reading file", zap.Error(err))
+			os.Exit(-1)
 		}
 	}
 	return lines
@@ -117,13 +118,13 @@ func openFile(filePath string) *os.File {
 			// file does not exist
 			f, err = os.Create(filePath)
 			if err != nil {
-				//panic(err)
-				log.Fatal(err)
+				zap.L().Error("Error creating file", zap.Error(err))
+				os.Exit(-1)
 			}
 		} else {
 			// other error
-			log.Fatal(err)
-			//panic(err)
+			zap.L().Error("Other error occurred", zap.Error(err))
+			os.Exit(-1)
 		}
 	}
 
@@ -156,7 +157,8 @@ func dumpStringsSliceToFile(repos []string, filePath string) {
 	content := strings.Join(repos, "\n")
 	err := ioutil.WriteFile(filePath, []byte(content), 0755)
 	if err != nil {
-		panic(err)
+		zap.L().Error("Error writing to file", zap.Error(err))
+		os.Exit(-1)
 	}
 }
 
