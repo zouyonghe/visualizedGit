@@ -13,3 +13,5 @@ visualizedGit
 *.out
 
 .idea
+.gopath/
+.cache/

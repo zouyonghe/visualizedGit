@@ -19,11 +19,11 @@ package cmd
 import (
 	"fmt"
 	"github.com/fatih/color"
+	"go.uber.org/zap"
 	"time"
 	"visualizedGit/lib"
 
 	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/spf13/cobra"
 )
@@ -35,10 +35,14 @@ var showCmd = &cobra.Command{
 	Long:  `Show visualized local git contributions.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if email == "" {
-			color.Red("No email address specified error!")
-			fmt.Println()
-			fmt.Println("Using \"visualizedGit add --help\" for more information")
-			return
+			email = lib.GetDefaultGitEmail()
+			if email == "" {
+				color.Red("No email address specified and none found in git config!")
+				fmt.Println()
+				fmt.Println("Using \"visualizedGit show --help\" for more information")
+				return
+			}
+			color.Green("Using git config email: %s", email)
 		}
 		stats(email)
 	},
@@ -97,18 +101,19 @@ func fillCommits(email string, path string, commits map[int]int) map[int]int {
 	// instantiate a git repo object from path
 	repo, err := git.PlainOpen(path)
 	if err != nil {
-		panic(err)
+		zap.L().Warn("skip repo: cannot open path", zap.String("path", path), zap.Error(err))
+		return commits
 	}
 	// get the HEAD reference
-	ref, err := repo.Reference(plumbing.HEAD, false)
-	//ref, err := repo.Head()
+	ref, err := repo.Head()
 	if err != nil {
-		panic(err)
+		zap.L().Warn("skip repo: cannot resolve HEAD", zap.String("path", path), zap.Error(err))
+		return commits
 	}
 	// get the commits history starting from HEAD
 	iterator, err := repo.Log(&git.LogOptions{From: ref.Hash()})
 	if err != nil {
-		//panic(err)
+		zap.L().Warn("skip repo: cannot walk history", zap.String("path", path), zap.Error(err))
 		return commits
 	}
 	err = iterator.ForEach(func(c *object.Commit) error {
@@ -137,8 +142,8 @@ func processRepositories(email string) map[int]int {
 	repos := lib.ParseFileLinesToSlice(filePath)
 	daysInMap := lib.GetDaysInLastSixMonths()
 
-	commits := make(map[int]int, daysInMap)
-	for i := daysInMap; i > 0; i-- {
+	commits := make(map[int]int, daysInMap+1)
+	for i := 0; i <= daysInMap; i++ {
 		commits[i] = 0
 	}
 
@@ -191,7 +196,7 @@ func printCell(val int, today bool) {
 	}
 
 	if val == 0 {
-		fmt.Printf(escape + "  - " + "\033[0m")
+		fmt.Print(escape + "  - " + "\033[0m")
 		return
 	}
 
@@ -216,22 +221,29 @@ func printCommitsStats(commits map[int]int) {
 func buildCols(commits map[int]int) map[int]column {
 	cols := make(map[int]column)
 	col := column{}
-	for i := 0; i < 7-calcOffset()-1; i++ {
+	offset := calcOffset()
+	for i := 0; i < 7-offset-1; i++ {
 		col = append(col, 0)
 	}
-	for i := 0; i < calcOffset()+1; i++ {
+	for i := 0; i < offset+1; i++ {
 		col = append(col, commits[i])
 	}
 	cols[0] = col
 	col = column{}
 	week := 1
-	for i := 0; i < len(commits)-calcOffset(); i++ {
-		col = append(col, commits[i+calcOffset()+1])
+	for i := 0; i < len(commits)-offset-1; i++ {
+		col = append(col, commits[i+offset+1])
 		if len(col) == 7 {
 			cols[week] = col
 			week++
 			col = column{}
 		}
+	}
+	if len(col) > 0 {
+		for len(col) < 7 {
+			col = append(col, 0)
+		}
+		cols[week] = col
 	}
 	return cols
 }
@@ -304,5 +316,5 @@ func printDayCol(day int) {
 		out = " Sat "
 	}
 
-	fmt.Printf(out)
+	fmt.Print(out)
 }

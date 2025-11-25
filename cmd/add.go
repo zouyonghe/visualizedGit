@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+	"os"
 	"visualizedGit/lib"
 )
 
@@ -32,10 +33,12 @@ var addCmd = &cobra.Command{
 	Long:  `Add a new folder to scan for Git repositories.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if path == "" {
-			color.Red("No path specified error!")
-			fmt.Println()
-			fmt.Println("Using \"visualizedGit add --help\" for more information")
-			return
+			wd, err := os.Getwd()
+			if err != nil {
+				color.Red("Cannot determine current directory")
+				return
+			}
+			path = wd
 		}
 		scan(path)
 	},

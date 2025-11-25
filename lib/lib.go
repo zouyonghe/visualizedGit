@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"os/user"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -199,4 +200,43 @@ func daysOfMonth(year int, month int) int {
 
 func GetWeeksInLastSixMon(days int) int {
 	return days/7 + 1
+}
+
+// GetDefaultGitEmail returns the git user.email from the global gitconfig file.
+// VISUALIZEDGIT_GITCONFIG can override the file path for testing.
+func GetDefaultGitEmail() string {
+	confPath := os.Getenv("VISUALIZEDGIT_GITCONFIG")
+	if confPath == "" {
+		usr, err := user.Current()
+		if err != nil {
+			return ""
+		}
+		confPath = filepath.Join(usr.HomeDir, ".gitconfig")
+	}
+
+	data, err := os.ReadFile(confPath)
+	if err != nil {
+		return ""
+	}
+
+	var inUser bool
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		switch {
+		case strings.HasPrefix(line, "[") && strings.Contains(line, "user"):
+			inUser = true
+			continue
+		case strings.HasPrefix(line, "[") && !strings.Contains(line, "user"):
+			inUser = false
+			continue
+		}
+
+		if inUser && strings.HasPrefix(line, "email") {
+			parts := strings.SplitN(line, "=", 2)
+			if len(parts) == 2 {
+				return strings.TrimSpace(parts[1])
+			}
+		}
+	}
+	return ""
 }

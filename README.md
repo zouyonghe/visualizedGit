@@ -14,8 +14,8 @@ go install .
 
 ```shell
 visualizedGit --help                          # Show help information of this tool
-visualizedGit add -p /path/to/repo(s)         # Add Git repository which you would like to track
-visualizedGit show -e email@address.com       # show visualized local git contribution of the specified email address
+visualizedGit add -p /path/to/repo(s)         # Add Git repository which you would like to track (defaults to current dir)
+visualizedGit show -e email@address.com       # show visualized local git contribution (defaults to git config user.email)
 visualizedGit chkcfg                          # Show current tracking git repositories
 visualizedGit rmcfg                           # Remove tracking git repositories
 ```
